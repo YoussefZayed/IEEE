@@ -10,14 +10,14 @@ MeBuzzer buzzer;
 // x and y are flipped x is vertical y is horizontal
 byte board [7][4] {
   {1, 1, 1, 1},
+  {1, 1, 1, 0},
+  {1, 0, 1, 1},
   {1, 1, 1, 1},
-  {1, 1, 1, 1},
-  {1, 1, 1, 1},
-  {1, 1, 1, 1},
-  {1, 1, 1, 1},
+  {1, 0, 1, 0},
+  {0, 1, 1, 1},
   {1, 1, 1, 1}
 };
-byte path [10][2] {
+short path [10][2] {
   {6, 1},
   {6, 2},
   {6, 3},
@@ -29,16 +29,19 @@ byte path [10][2] {
   {0, 3},
   { -1, -1}
 };
-byte path_step = 0;
-byte pathx = 0;
-byte pathy = 0;
-byte curr_x = 0;
-byte curr_y = 0;
-byte curr_d = 1;
-byte d_needed = 1;
-byte h = 0;
-byte curr_px = 0;
-byte curr_py = 0;
+
+short pathx = 0;
+short pathy = 0;
+short curr_x = 6;
+short curr_y = 0;
+short curr_d = 1;
+short d_needed = 1;
+
+short path_step = 0;
+short h = 0;
+short curr_px = 0;
+short curr_py = 0;
+short total_n = 0;
 
 MeDCMotor motor1(PORT_1);
 MeDCMotor motor3(M1);
@@ -60,58 +63,78 @@ void setup() {
 
   pinMode(12, INPUT);
   pinMode(9, INPUT);
-  delay(2000);
+
 
 }
 
 void loop() {
+  for (byte i = 0; i < 10; i++) {
+    Serial.print(path[i][0]);
+    Serial.print(" , ");
+    Serial.println(path[i][1]);
+    delay(1);
+  }
+  delay(1);
+  Serial.println("path 1");
+  delay(1);
+  aStar();
+  delay(1);
+  Serial.println("path 2");
+  for (byte i = 0; i < 10; i++) {
+    Serial.print(path[i][0]);
+    Serial.print(" , ");
+    Serial.println(path[i][1]);
+    delay(1);
+  }
+  delay (500000);
 
-  leftSensor = digitalRead(12);
-  rightSensor = digitalRead(9);
-  objectD = ultraSensor.distanceCm();
-  //  Serial.print(leftSensor);
-  //  Serial.println(rightSensor);
-  //
-  //  Serial.print(ultraSensor.distanceCm());
-  //  Serial.println(" cm");
-  if (curr_d > 4) {
-    curr_d = 1;
-  }
-  if (tr == true) {
-    turnR();
-  }
-  else if (tl == true) {
-    turnL();
-  }
-  else if (leftSensor == 1 && rightSensor == 0) {
-    motor1.run(-motorSpeed);
-    motor3.run(-motorSpeed);
-    motor2.run(motorSpeed - 100);
-    motor4.run(motorSpeed - 100);
 
-  }
-  else if (leftSensor == 0 && rightSensor == 1) {
-    motor1.run(-motorSpeed + 100);
-    motor3.run(-motorSpeed + 100);
-    motor2.run(motorSpeed);
-    motor4.run(motorSpeed);
-
-  }
-
-  else if (leftSensor == 0 && rightSensor == 0) {
-    buzzer.tone(262, 0.25 * 1000);
-    brake();
-    delay(20);
-    Serial.print(pathx);
-    Serial.print("_node_");
-    Serial.println(pathy);
-    moved = true;
-    checkNode();
-
-  }
-  else {
-    drive();
-  }
+    leftSensor = digitalRead(12);
+    rightSensor = digitalRead(9);
+    objectD = ultraSensor.distanceCm();
+    Serial.print(leftSensor);
+    Serial.println(rightSensor);
+  
+    Serial.print(ultraSensor.distanceCm());
+    Serial.println(" cm");
+    if (curr_d > 4) {
+      curr_d = 1;
+    }
+    if (tr == true) {
+      turnR();
+    }
+    else if (tl == true) {
+      turnL();
+    }
+    else if (leftSensor == 1 && rightSensor == 0) {
+      motor1.run(-motorSpeed);
+      motor3.run(-motorSpeed);
+      motor2.run(motorSpeed - 100);
+      motor4.run(motorSpeed - 100);
+  
+    }
+    else if (leftSensor == 0 && rightSensor == 1) {
+      motor1.run(-motorSpeed + 100);
+      motor3.run(-motorSpeed + 100);
+      motor2.run(motorSpeed);
+      motor4.run(motorSpeed);
+  
+    }
+  
+    else if (leftSensor == 0 && rightSensor == 0) {
+      buzzer.tone(262, 0.25 * 1000);
+      brake();
+      delay(20);
+      Serial.print(pathx);
+      Serial.print("_node_");
+      Serial.println(pathy);
+      moved = true;
+      checkNode();
+  
+    }
+    else {
+      drive();
+    }
 
 
 }
@@ -303,20 +326,115 @@ void checkNode() {
 }
 
 void aStar () {
-  path = {
-    { -1, -1},
-    { -1, -1},
-    { -1, -1},
-    { -1, -1},
-    { -1, -1},
-    { -1, -1},
-    { -1, -1},
-    { -1, -1},
-    { -1, -1},
-    { -1, -1}
-  };
 
+  path[0][0] = -1;
+  path[0][1] = -1;
+  path[1][0] = -1;
+  path[1][1] = -1;
+  path[2][0] = -1;
+  path[2][1] = -1;
+  path[3][0] = -1;
+  path[3][1] = -1;
+  path[4][0] = -1;
+  path[4][1] = -1;
+  path[5][0] = -1;
+  path[5][1] = -1;
+  path[6][0] = -1;
+  path[6][1] = -1;
+  path[7][0] = -1;
+  path[7][1] = -1;
+  path[8][0] = -1;
+  path[8][1] = -1;
+  path[9][0] = -1;
+  path[9][1] = -1;
+  path_step = 0;
+  curr_px = curr_x;
+  curr_py = curr_y;
+  while ( !(path[path_step][0] == 0 && path[path_step][1] == 3) && path_step < 10 ) {
 
+    h = 0;
+    total_n = 99;
 
+    if ( (curr_px - 1) >= 0) {
+      if (board[curr_px - 1][curr_py] == 1) {
 
+        h =  calcH(curr_px - 1, curr_py);
+        if (h < total_n) {
+          total_n = h;
+          path[path_step][0] = (curr_px - 1);
+          path[path_step][1] = curr_py;
+        }
+      }
+    }
+    if ( (curr_py + 1) <= 3) {
+
+      if (board[curr_px][curr_py + 1] == 1) {
+
+        h = calcH(curr_px , curr_py + 1);
+        if (h < total_n) {
+          total_n = h;
+          path[path_step][0] = (curr_px);
+          path[path_step][1] = (curr_py + 1);
+        }
+      }
+    }
+    if ( (curr_py - 1) >= 0) {
+      if (board[curr_px][curr_py - 1] == 1) {
+        h = calcH(curr_px, curr_py - 1);
+        if (h < total_n) {
+          total_n = h;
+          path[path_step][0] = (curr_px);
+          path[path_step][1] = (curr_py - 1);
+        }
+      }
+    }
+    if ( (curr_px + 1) <= 6) {
+      if (board[curr_px + 1][curr_py] == 1) {
+        h = calcH(curr_px + 1, curr_py);
+        if (h < total_n) {
+          total_n = h;
+          path[path_step][0] = (curr_px + 1);
+          path[path_step][1] = curr_py;
+        }
+      }
+    }
+    if ((curr_px - 1) >= 0) {
+
+      if ( (curr_py - 1) >= 0) {
+
+        if (board[curr_px - 1][curr_py] == 0 && board[curr_px][curr_py - 1] == 0 && curr_py == 3 ) {
+
+          board[curr_px][curr_py] = 0;
+        }
+      }
+      if ( (curr_py + 1) <= 3) {
+        if (board[curr_px - 1][curr_py] == 0 && board[curr_px][curr_py + 1] == 0 && curr_py == 0 ) {
+          board[curr_px][curr_py] = 0;
+        }
+      }
+    }
+    if (path_step > 0) {
+      if (path[path_step - 1][0] == 0 && path[path_step - 1][1] == 3) {
+
+        path[path_step][0] = -1;
+        path[path_step][1] = -1;
+        break;
+      }
+    }
+
+    curr_px = path[path_step][0];
+    curr_py = path[path_step][1];
+    path_step++;
+  }
+}
+
+short calcH (short x, short y) {
+  y = y - 3;
+  if (x < 0 ) {
+    x = -x;
+  }
+  if (y < 0 ) {
+    y = -y;
+  }
+  return (x + y);
 }
