@@ -7,14 +7,14 @@ boolean moved = true;
 MeBuzzer buzzer;
 
 // x and y are flipped x is vertical y is horizontal
-short board [7][4] {
-  {0, 0, 0, 0},
-  {0, 0, 0, 0},
-  {0, 0, 0, 0},
-  {0, 0, 0, 0},
-  {0, 0, 0, 0},
-  {0, 0, 0, 0},
-  {0, 0, 0, 0}
+byte board [7][4] {
+  {1, 1, 1, 1},
+  {1, 1, 1, 1},
+  {1, 1, 1, 1},
+  {1, 1, 1, 1},
+  {1, 1, 1, 1},
+  {1, 1, 1, 1},
+  {1, 1, 1, 1}
 };
 short path [10][2] {
   {6, 1},
