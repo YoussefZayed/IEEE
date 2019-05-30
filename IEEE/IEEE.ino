@@ -1,10 +1,11 @@
 
 #include "MeMCore.h"
-short leftSensor;
-short rightSensor;
+byte leftSensor;
+byte rightSensor;
 boolean starting = true;
 boolean moved = true;
 MeBuzzer buzzer;
+
 
 // x and y are flipped x is vertical y is horizontal
 byte board [7][4] {
@@ -16,7 +17,7 @@ byte board [7][4] {
   {1, 1, 1, 1},
   {1, 1, 1, 1}
 };
-short path [10][2] {
+byte path [10][2] {
   {6, 1},
   {6, 2},
   {6, 3},
@@ -28,20 +29,23 @@ short path [10][2] {
   {0, 3},
   { -1, -1}
 };
-short path_step = 0;
-short pathx = 0;
-short pathy = 0;
-short curr_x = 0;
-short curr_y = 0;
-short curr_d = 1;
-short d_needed = 1;
+byte path_step = 0;
+byte pathx = 0;
+byte pathy = 0;
+byte curr_x = 0;
+byte curr_y = 0;
+byte curr_d = 1;
+byte d_needed = 1;
+byte h = 0;
+byte curr_px = 0;
+byte curr_py = 0;
 
 MeDCMotor motor1(PORT_1);
 MeDCMotor motor3(M1);
 
 MeDCMotor motor2(PORT_2);
 MeDCMotor motor4(M2);
-short objectD = 0;
+byte objectD = 0;
 uint8_t motorSpeed = 200;
 
 MeUltrasonicSensor ultraSensor(4);
@@ -49,7 +53,7 @@ MeUltrasonicSensor ultraSensor(4);
 boolean tr = false;
 boolean tl = false;
 boolean at_stop = false;
-short tring = 0;
+byte tring = 0;
 void setup() {
 
   Serial.begin(9600);
@@ -218,23 +222,17 @@ void turnL() {
     delay(100);
     moved = false;
     checkNode();
-
-
-
   }
 }
 void brake() {
-
   motor1.stop();
   motor2.stop();
   motor3.stop();
   motor4.stop();
-
 }
 
 
 void checkNode() {
-
   if (starting == true) {
     curr_y = 0;
     curr_x = 6;
@@ -242,7 +240,6 @@ void checkNode() {
     path_step--;
   }
   if (moved == true) {
-
     path_step++;
     pathx = path[path_step][0];
     pathy = path[path_step][1];
@@ -303,7 +300,21 @@ void checkNode() {
     tring = 0;
     turnR();
   }
+}
 
+void aStar () {
+  path = {
+    { -1, -1},
+    { -1, -1},
+    { -1, -1},
+    { -1, -1},
+    { -1, -1},
+    { -1, -1},
+    { -1, -1},
+    { -1, -1},
+    { -1, -1},
+    { -1, -1}
+  };
 
 
 
